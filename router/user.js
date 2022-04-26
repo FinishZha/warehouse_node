@@ -1,5 +1,4 @@
 const express = require('express')
-const { is } = require('express/lib/request')
 const { OPEN_DEBUG } = require('../globalconfig')
 const Result = require('../model/Result')
 const { login } = require('../services/user')
