@@ -5,11 +5,11 @@ const { waitintoWorkshop, getAllRealinWrokshop, getAllWaitintoWrokshop } = requi
 const { OPEN_DEBUG } = require('../globalconfig')
 
 
-//提交数据(单条)
+//提交数据(单条,设置入库状态为0，表示待入库)
 router.post('/codeinto', (req, res)=>{
-    let { pdaCode, trayCode } = req.body
+    let { createPerson, pdaCode, trayCode } = req.body
     if(pdaCode && trayCode){
-        waitintoWorkshop(pdaCode, trayCode).then((result, error) => {
+        waitintoWorkshop(createPerson, pdaCode, trayCode).then((result, error) => {
             if (error){
                 OPEN_DEBUG && console.log(error);
                 new Result( error, '插入数据失败').fail(res)
@@ -43,5 +43,10 @@ router.get('/getallwaitintoworkshop', (req, res) =>{
         }
     })
 })
+
+// //待入库处理
+// router.post('/',(req,res) => {
+
+// })
 
 module.exports = router

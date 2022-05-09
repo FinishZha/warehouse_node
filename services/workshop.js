@@ -1,8 +1,8 @@
 const { querySql } = require('../db/index')
 
 //待入库
-function waitintoWorkshop(pdaCode,trayCode){
-    return querySql(`insert into storagetray(pdaCode,trayCode,actFlag,createDate) value('${pdaCode}','${trayCode}',0,sysdate());`)
+function waitintoWorkshop(createPerson,pdaCode,trayCode){
+    return querySql(`insert into storagetray(pdaCode,trayCode,actFlag,createDate) value('${createPerson}',${pdaCode}','${trayCode}',0,sysdate());`)
 }
 
 //全部入库(得多条插入)
@@ -19,6 +19,11 @@ function getAllRealinWrokshop(){
 function getAllWaitintoWrokshop(){
     return querySql(`select pdaCode, trayCode, createDate from storagetray where actFlag = 0;`)
 }
+
+// function addServeryIntoworkshop(){
+    
+// }
+
 
 module.exports = {
     waitintoWorkshop,
