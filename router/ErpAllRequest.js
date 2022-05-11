@@ -1,5 +1,5 @@
 const express = require('express')
-const { getFuncName, getfstName } = require('../services/company')
+const { getFuncName, getfstName } = require('../services/ErpAllMapper')
 const Result = require('../model/Result')
 
 const router = express.Router()

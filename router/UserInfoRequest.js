@@ -1,11 +1,12 @@
 const express = require('express')
 const { OPEN_DEBUG } = require('../globalconfig')
 const Result = require('../model/Result')
-const { login } = require('../services/user')
+const { login } = require('../services/UserInfoMapper')
 
 const router = express.Router()
 
 router.post('/login', (req, res)=>{
+    console.log(req.body);
     let { usercode, pwd } = req.body
     OPEN_DEBUG && console.log(req.body)
     login(usercode, pwd).then( user => {
