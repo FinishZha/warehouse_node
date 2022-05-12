@@ -1,4 +1,6 @@
 const { loadingPdfCodes, checkPdfTrayCodeQuery, checkPdfTrayIdQuery, getStId, deleteErrorPdfBarCode, deleteErrorPdfTrayCode, queryBarCodeInTrayCode} = require('../services/PdfScanCodeMapper')
+const { OPEN_DEBUG } = require('../globalconfig')
+
 
 function loadingPdfCodesService(pdaCode, scanId, whId) {
     return loadingPdfCodes(pdaCode, scanId, whId)
@@ -12,7 +14,7 @@ async function scanAPdfTrayCodeService(pdaCode, scanId, whId, trayCode){
         return msg
     }
     //2:取出托码对应的信息和托码下面条码对应的信息，
-
+        
     //3:插入数据到storagetray和storageBar.此处还需要加上事务控制，保证全部成功或者全部失败
 
     return msg
@@ -27,7 +29,6 @@ async function checkPdfTrayCodeService( pdaCode, scanId, whId, trayCode ){
        return msg = '该托码不属于本公司'
     }else{
          //2:校验托码是属于本仓库的
-        console.log(res);
         if( res[0].whId != whId ){
             return  msg = '该托码不属于本仓库'
         }
@@ -37,7 +38,7 @@ async function checkPdfTrayCodeService( pdaCode, scanId, whId, trayCode ){
         }
         //4:要校验(校验那个表？ strongTray)暂存表里面已经有该条记录，不能重复插入.
         let stbTrayIdCheckRes = await checkPdfTrayIdQuery(res[0].trayId, trayCode)
-        console.log(stbTrayIdCheckRes);
+        OPEN_DEBUG &&  console.log(stbTrayIdCheckRes);
         if(stbTrayIdCheckRes.length > 0 || stbTrayIdCheckRes != null){
             return msg = '已有记录，不可重复插入'
         }

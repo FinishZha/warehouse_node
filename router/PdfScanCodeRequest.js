@@ -26,9 +26,11 @@ router.get('/scanAPdfTrayCode', (req, res)=>{
 
     if(checkMsg.checkRes != '合法'){
         //不合法干什么
+        return new Result('这条数据不可插入')
     }
 
     if(checkMsg.checkRes == '合法') {
+        return new Result('这条数据可插入')
         //合法干什么
         //开始插入数据
         //2:取出托码对应的信息和托码下面条码对应的信息，
@@ -44,20 +46,18 @@ router.post('/commitPdfCode', (req, res) => {
     new Result('success').success(res)
 })
 
-//3:进入页面的时候载入上次还没有提交的暂存表的数据
+//3:进入页面的时候载入上次还没有提交的暂存表的数据（此接口已完成）
 router.get('/loadingPdfCodes', (req, res) => {
     let {pdaCode, scanId, whId} = req.query
-    console.log(req.query);
     loadingPdfCodesService(pdaCode, scanId, whId).then( result => {
-        new Result(result).success(res)
+        new Result(result, 'success').success(res)
     } )
 })
 
-//4：左滑删除误扫入的托码,
+//4：左滑删除误扫入的托码,（此接口已完成）
 router.post('/deleteErrorPdfCode', (req, res) => {
     // res.send('success')
     let {pdaCode, trayCode, scanId, whId} = req.body
-    console.log(req.body);
     async function getFlag(){
         let flag =  await deleteErrorPdfCodeServiece(pdaCode, trayCode, scanId, whId)
         console.log(flag);
@@ -70,14 +70,14 @@ router.post('/deleteErrorPdfCode', (req, res) => {
     getFlag()
 })
 
-//5：根据输入的托码查询对应该托码的条码
+//5：根据输入的托码查询对应该托码的条码（此接口已完成）
 router.get('/queryBarCodeInTrayCode', (req, res) => {
     // res.send('success')
     let { trayCode } = req.query
     let productItemsList = ''
     async function getProduceItemsList(){
         productItemsList = await queryBarCodeInTrayCodeService(trayCode)
-        return new Result(productItemsList).success(res)
+        return new Result(productItemsList, 'success').success(res)
     }
     getProduceItemsList()
 })
