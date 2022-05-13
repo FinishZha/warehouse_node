@@ -41,10 +41,10 @@ router.post('/createNewWarehouse', (req, res) => {
             if( addRes == 'success') {
                 new Result('库创建成功').success(res)
             }else{
-                new Result(`库创建失败,原因：${addRes}`).fail(res)
+                new Result(`库创建失败,原因：此库${addRes}`).fail(res)
             }
         }else{
-            new Result(`创建失败,原因：${checkMsg}`).fail(res)
+            new Result(`创建失败,原因：此库${checkMsg}`).fail(res)
         }
     }
     createNewWarehouse()
