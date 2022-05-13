@@ -34,7 +34,7 @@ router.get('/getAllProductItems', (req, res)=>{
 router.post('/createNewWarehouse', (req, res) => {
     let { fstId, whCode, createPerson } = req.body
     let checkMsg = ''
-    async function checkWarehouseIsExited(){
+    async function createNewWarehouse(){
         checkMsg = await checkPdfWarehouseExit(fstId, whCode)
         if(checkMsg == 'unexited') {
             let addRes = await addWarehouse( whCode, fstId, createPerson)
@@ -47,8 +47,10 @@ router.post('/createNewWarehouse', (req, res) => {
             new Result(`创建失败,因为该库${checkMsg}`).fail(res)
         }
     }
-    checkWarehouseIsExited()
+    createNewWarehouse()
 })
+
+
 
 
 module.exports = router
