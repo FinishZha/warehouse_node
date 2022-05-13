@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Result = require('../model/Result')
-// const { getAllWareHouse }  = require('../handles/InventoryService')
+const { checkPdfWarehouseExit,addWarehouse }  = require('../handles/InventoryService')
 const { getAllWoreHouseQuery, getAllTrayQuery, getAllProductItemQuery } = require('../services/InventoryMapper')
 
 
@@ -28,6 +28,26 @@ router.get('/getAllProductItems', (req, res)=>{
     getAllProductItemQuery(fstId, whId, strayId).then(productItemsList => {
         new Result(productItemsList, 'success').success(res)
     })
+})
+
+// 创建新库
+router.post('/createNewWarehouse', (req, res) => {
+    let { fstId, whCode, createPerson } = req.body
+    let checkMsg = ''
+    async function checkWarehouseIsExited(){
+        checkMsg = await checkPdfWarehouseExit(fstId, whCode)
+        if(checkMsg == 'unexited') {
+            let addRes = await addWarehouse( whCode, fstId, createPerson)
+            if( addRes == 'success') {
+                new Result('库插入成功').success(res)
+            }else{
+                new Result('库插入失败').fail(res)
+            }
+        }else{
+            new Result(`创建失败,因为该库${checkMsg}`).fail(res)
+        }
+    }
+    checkWarehouseIsExited()
 })
 
 

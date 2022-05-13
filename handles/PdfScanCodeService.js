@@ -1,4 +1,4 @@
-const { loadingPdfCodes, checkPdfTrayCodeQuery, checkPdfTrayIdQuery, getStId, deleteErrorPdfBarCode, deleteErrorPdfTrayCode, queryBarCodeInTrayCode} = require('../services/PdfScanCodeMapper')
+const { loadingPdfCodes, checkPdfTrayCodeQuery, checkPdfTrayIdQuery, getStId, deleteErrorPdfBarCode, deleteErrorPdfTrayCode, queryBarCodeInTrayCode, getProducyItemsCountQuery} = require('../services/PdfScanCodeMapper')
 const { OPEN_DEBUG } = require('../globalconfig')
 
 
@@ -6,6 +6,7 @@ function loadingPdfCodesService(pdaCode, scanId, whId) {
     return loadingPdfCodes(pdaCode, scanId, whId)
 }
 
+// function che
 
 async function scanAPdfTrayCodeService(pdaCode, scanId, whId, trayCode){
     let msg = 'success'
@@ -76,6 +77,16 @@ async function commitTrayCodeIntoWhService(pdaCode, scanId, whId){
         // 置为-1表示已经提交，0表示是误操作删除。
         //这里只写最后一步。其实和误删除的操作方式类似.但是这里是批处理
 }
+
+
+// function checkWarehouseIsFullService(whCode){
+//     let msg = 'not full'
+//     let  count = getProducyItemsCountQuery(whCode)
+//     if(count > ){
+
+//     }
+// }
+
 
 
 module.exports = {

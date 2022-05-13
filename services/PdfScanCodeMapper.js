@@ -36,10 +36,15 @@ function deleteErrorPdfTrayCode(stId){
     return querySql(`UPDATE storagetray SET actFlag = 0 WHERE stId = '${ stId }';`)
 }
 
+function getProducyItemsCountQuery() {
+    return querySql(`SELECT COUNT(*) FROM productitems WHERE fstId = '4' AND  whId = '1' AND trayId = '1' AND productStatus = '1001';`)
+}
+
 module.exports = {
     loadingPdfCodes,
     checkPdfTrayCodeQuery,
     checkPdfTrayIdQuery,
+    getProducyItemsCountQuery,
     queryBarCodeInTrayCode,
     updatePdfBarCodes,
     updatePdfTrayCodes,
