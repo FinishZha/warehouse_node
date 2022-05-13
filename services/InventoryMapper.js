@@ -25,6 +25,11 @@ function getAllTrayQuery(fstId, whId){
     return querySql(`SELECT * FROM packages WHERE whId = '${ whId }' AND fstId = '${fstId}' AND actFlag = '1';`)
 }
 
+//获取指定的托 
+function getTargetTrayCountQuery(fstId, whId, trayCode){
+    return querySql(`SELECT COUNT(*) trayCount FROM packages WHERE whId = '${ whId }' AND fstId = '${fstId}' AND trayCode = '${trayCode}' AND actFlag = '1';`)
+}
+
 //获取指定库、指定托的所有产品
 function getAllProductItemQuery(fstId, whId, strayId){
     return querySql(`SELECT proId, barCode, reqCode, createdate, inWarehouseDate, productStatus FROM productitems WHERE fstId = '${fstId}' AND whId = '${whId}' AND trayId = '${strayId}' AND actFlag = '1';`)
@@ -35,10 +40,17 @@ function addWarehouseQuery(whCode, fstId, createPerson){
     return querySql(`INSERT INTO warehouse (whCode, fstId, actFlag, createPerson, createDate) VALUES ('${whCode}', '${fstId}' , 1 , '${createPerson}', SYSDATE());`)
 }
 
+//添加托
+function addTrayQuery(trayCode, whId, fstId, createPerson){
+    return querySql(`INSERT INTO packages (trayCode, fstId, whId ,createDate, createPerson, actFlag) VALUES ('${trayCode}', '${fstId}', '${whId}', SYSDATE(), '${createPerson}', '1');`)
+}
+
 module.exports = {
     getAllWoreHouseQuery,
     getAllProductItemQuery,
     getAllTrayQuery,
     getTargetWarehouseQuery,
-    addWarehouseQuery
+    addWarehouseQuery,
+    addTrayQuery,
+    getTargetTrayCountQuery
 }

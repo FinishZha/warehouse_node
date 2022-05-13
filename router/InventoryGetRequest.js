@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Result = require('../model/Result')
-const { checkPdfWarehouseExit,addWarehouse }  = require('../handles/InventoryService')
+const { checkPdfWarehouseExitService, addWarehouseService, checkWarehouseIsFullService,addNewTaryService,checkTrayIsReaptService}  = require('../handles/InventoryService')
 const { getAllWoreHouseQuery, getAllTrayQuery, getAllProductItemQuery } = require('../services/InventoryMapper')
 
 
@@ -35,21 +35,46 @@ router.post('/createNewWarehouse', (req, res) => {
     let { fstId, whCode, createPerson } = req.body
     let checkMsg = ''
     async function createNewWarehouse(){
-        checkMsg = await checkPdfWarehouseExit(fstId, whCode)
+        checkMsg = await checkPdfWarehouseExitService(fstId, whCode)
         if(checkMsg == 'unexited') {
-            let addRes = await addWarehouse( whCode, fstId, createPerson)
+            let addRes = await addWarehouseService( whCode, fstId, createPerson)
             if( addRes == 'success') {
-                new Result('库插入成功').success(res)
+                new Result('库创建成功').success(res)
             }else{
-                new Result('库插入失败').fail(res)
+                new Result(`库创建失败,原因：${addRes}`).fail(res)
             }
         }else{
-            new Result(`创建失败,因为该库${checkMsg}`).fail(res)
+            new Result(`创建失败,原因：${checkMsg}`).fail(res)
         }
     }
     createNewWarehouse()
 })
 
+//创建新托
+router.post('/createNewTray', (req, res)=>{
+    let {trayCode, whId, fstId, createPerson} = req.body
+    let checkMsg = ''
+    async function createNewTray(){
+       checkMsg = await checkWarehouseIsFullService(fstId, whId)
+       if(checkMsg == 'full'){
+         new Result(`不可创建托，原因:该库状态为${checkMsg}`).fail(res)
+       }else{
+        let checkTrayMsg = await checkTrayIsReaptService(fstId, whId, trayCode)
+        if(checkTrayMsg == 'unduplication' ){
+            //添加的调用
+          let addRes = await addNewTaryService(trayCode, whId, fstId, createPerson) 
+          if(addRes == 'success') {
+                new Result('托创建成功').success(res)
+            }else{
+                new Result(`托创建失败,原因：${addRes}`).fail(res)
+            }
+          }else{
+            new Result(`托创建失败,原因：本托码${checkTrayMsg}`).fail(res)
+          }
+       }
+    }
+    createNewTray()
+})
 
 
 
