@@ -10,9 +10,8 @@ const { querySql } = require('../db/index')
  * 
  */
 //获取所有的仓库
-
 function getAllWoreHouseQuery(fstId) {
-    return querySql(`SELECT wh.whId, wh.whCode FROM warehouse wh WHERE fstId = '${fstId}' AND actFlag = '1';`)
+    return querySql(`SELECT wh.whId, wh.whCode, wh.createPerson, wh.createDate FROM warehouse wh WHERE fstId = '${fstId}' AND actFlag = '1';`)
 }
 
 //查询特定的库
@@ -32,7 +31,12 @@ function getTargetTrayCountQuery(fstId, whId, trayCode){
 
 //获取指定库、指定托的所有产品
 function getAllProductItemQuery(fstId, whId, strayId){
-    return querySql(`SELECT proId, barCode, reqCode, createdate, inWarehouseDate, productStatus FROM productitems WHERE fstId = '${fstId}' AND whId = '${whId}' AND trayId = '${strayId}' AND actFlag = '1';`)
+    return querySql(`SELECT proId, barCode, reqCode, createdate, inWarehouseDate, productStatus FROM productitems WHERE fstId = '${fstId}' AND whId = '${whId}' AND trayId = '${strayId}' AND actFlag = '1' AND productStatus IN ('1001','1003') ;`)
+}
+
+//获取指定库、指定托的所有产品数量
+function getTargetProductItemCountQuery(fstId, whId, strayId){
+    return querySql(`SELECT proId, barCode, reqCode, createdate, inWarehouseDate, productStatus FROM productitems WHERE fstId = '${fstId}' AND whId = '${whId}' AND trayId = '${strayId}' AND actFlag = '1' AND productStatus = '1001';`)
 }
 
 // 添加库
@@ -52,5 +56,6 @@ module.exports = {
     getTargetWarehouseQuery,
     addWarehouseQuery,
     addTrayQuery,
-    getTargetTrayCountQuery
+    getTargetTrayCountQuery,
+    getTargetProductItemCountQuery
 }

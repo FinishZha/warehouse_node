@@ -1,8 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const Result = require('../model/Result')
-const { checkPdfWarehouseExitService, addWarehouseService, checkWarehouseIsFullService,addNewTaryService,checkTrayIsReaptService}  = require('../handles/InventoryService')
+const { checkPdfWarehouseExitService, addWarehouseService, checkWarehouseIsFullService,addNewTaryService,checkTrayIsReaptService, checkTrayIsFullService}  = require('../handles/InventoryService')
 const { getAllWoreHouseQuery, getAllTrayQuery, getAllProductItemQuery } = require('../services/InventoryMapper')
+const { OPEN_DEBUG } = require('../globalconfig')
 
 
 //传入fstId获取库列表（此接口已完成）
@@ -74,6 +75,22 @@ router.post('/createNewTray', (req, res)=>{
        }
     }
     createNewTray()
+})
+
+//检查某托是否满件
+router.get('/checkTrayIsFull', (req, res)=>{
+    let { fstId, whId, strayId } = req.query
+    let checkMsg = ''
+    async function checkTrayIsFull(){
+        checkMsg = await checkTrayIsFullService(fstId, whId, strayId)
+        OPEN_DEBUG && console.log(checkMsg);
+        if( checkMsg === 'full' ){
+            new Result(checkMsg).fail(res)
+        }else{
+            new Result(checkMsg).success(res)
+        }
+    }
+    checkTrayIsFull()
 })
 
 

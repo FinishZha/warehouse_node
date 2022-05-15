@@ -1,5 +1,5 @@
 const { OPEN_DEBUG } = require('../globalconfig');
-const { getTargetWarehouseQuery, addWarehouseQuery, getAllTrayQuery, addTrayQuery, getTargetTrayCountQuery } = require('../services/InventoryMapper')
+const { getTargetWarehouseQuery, addWarehouseQuery, getAllTrayQuery, addTrayQuery, getTargetTrayCountQuery, getAllProductItemQuery, getTargetProductItemCountQuery } = require('../services/InventoryMapper')
 
 /**
  * 这是库存车间相关的服务函数
@@ -9,7 +9,7 @@ const { getTargetWarehouseQuery, addWarehouseQuery, getAllTrayQuery, addTrayQuer
 //检测某库是否存在
 async function checkPdfWarehouseExitService(fstId, whCode){
     let msg = 'unexited'
-    targetWarehouseCount = await getTargetWarehouseQuery(fstId, whCode)
+    let targetWarehouseCount = await getTargetWarehouseQuery(fstId, whCode)
     if( targetWarehouseCount[0].whCount > 0 ) {
         msg = 'exited'
     }
@@ -21,7 +21,7 @@ async function checkPdfWarehouseExitService(fstId, whCode){
 async function addWarehouseService(whCode, fstId, createPerson){
     let msg = 'success'
     if(whCode.length > 0){
-        addStatus = await addWarehouseQuery(whCode, fstId, createPerson)
+        let addStatus = await addWarehouseQuery(whCode, fstId, createPerson)
         OPEN_DEBUG && console.log(addStatus);
         if(addStatus.affectRows < 1) {
             return msg = 'filed'
@@ -36,7 +36,7 @@ async function addWarehouseService(whCode, fstId, createPerson){
 //检查目标库是否满托
 async function checkWarehouseIsFullService(fstId, whId){
     let msg = 'not full'
-    trayCount = await getAllTrayQuery(fstId, whId)
+    let trayCount = await getAllTrayQuery(fstId, whId)
     if(trayCount.length > 5){
         return msg = 'full'
     }
@@ -47,7 +47,7 @@ async function checkWarehouseIsFullService(fstId, whId){
 async function checkTrayIsReaptService(fstId, whId, trayCode){
     let msg = 'unduplication'
     let trayCount = await getTargetTrayCountQuery(fstId, whId, trayCode)
-    console.log(trayCount[0].trayCount);
+    OPEN_DEBUG && console.log(trayCount[0].trayCount);
     if(trayCount[0].trayCount > 0){
         return msg = 'duplication'
     }
@@ -61,7 +61,7 @@ async function addNewTaryService(trayCode, whId, fstId, createPerson){
     let msg = 'success'
     if( trayCode.length > 0 ){
         console.log(createPerson);
-        addStatus = await addTrayQuery(trayCode, whId, fstId, createPerson) 
+        let addStatus = await addTrayQuery(trayCode, whId, fstId, createPerson) 
         OPEN_DEBUG && console.log(addStatus);
         if(addStatus.affectRows < 1){
             return msg = 'failed'
@@ -75,6 +75,15 @@ async function addNewTaryService(trayCode, whId, fstId, createPerson){
 
 
 //检查各托是否满件
+async function checkTrayIsFullService(fstId, whId, strayId){
+    let msg = 'not full'
+    let productitemsCount = await getTargetProductItemCountQuery(fstId, whId, strayId)
+    if(productitemsCount.length > 10){
+        return msg = 'full'
+    }
+    OPEN_DEBUG && console.log(`fullMsg: ${msg}`);
+    return msg
+}
 
 
 module.exports = {
@@ -82,5 +91,6 @@ module.exports = {
     addWarehouseService,
     checkWarehouseIsFullService,
     addNewTaryService,
-    checkTrayIsReaptService
+    checkTrayIsReaptService,
+    checkTrayIsFullService
 }

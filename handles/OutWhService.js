@@ -1,0 +1,1 @@
+const { outTargetProductQuery } = require('../services/OutWhMapper')

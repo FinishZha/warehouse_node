@@ -53,13 +53,18 @@ async function deleteErrorPdfCodeServiece(pdaCode, trayCode, scanId, whId){
     let flag = 0
     //根据传入参数找到要删除的StorageTray的主键stId
     let stId = await getStId(pdaCode, trayCode, scanId , whId) 
+    console.log(stId);
     if(stId.length > 0){
         stId = stId[0].stId
         //先删除StorageBar所有条码，外键stId
         flag = await deleteErrorPdfBarCode(stId)
+        console.log(flag);
         //再删除storageTray的主键对应的记录
         flag = await deleteErrorPdfTrayCode(stId)
-        flag = affectedRows
+        // if(flag) {
+        //     flag = affectedRows
+        // }
+        flag = flag.affectedRows
     }else{
          flag = 0
     }
