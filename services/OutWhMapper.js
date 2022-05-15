@@ -15,8 +15,32 @@ function outTargetProductQuery(barCode, outWarehousePerson){
     return querySql(`UPDATE productitems SET outWarehouseDate = NOW(), outWarehousePerson = '${outWarehousePerson}', productStatus = '1002' WHERE barcode = '${barCode}' AND outWarehouseDate IS NULL;`)
 }
 
+//查询出库记录
+function outHistoryQuery(){
+    return querySql(`SELECT * FROM productitems WHERE actFlag=1 AND productStatus = 1002;`)
+}
+
+//查询所有返工出库和返工回库列表
+function reWorkHistotyQuery(){
+    return querySql(`SELECT * FROM productitems WHERE actFlag=1 AND productStatus IN (1006, 1003);`)
+}
+
+//返工出库
+function reWorkOutTargetProductQuery(barCode, outWarehousePerson){
+    return querySql(`UPDATE productitems SET reWorkData = NOW(), outWarehousePerson = '${outWarehousePerson}', productStatus = '1006' WHERE barcode = '${barCode}' AND productStatus IN ('1001', '1003');`)
+}
+
+//返工回库
+//1006为返工中状态
+function reWorkBackTargetProductQuery(barCode, createPerson){
+    return querySql(`UPDATE productitems SET outWarehouseDate = NULL, reWorkData = NULL, createPerson = '${createPerson}', productStatus = '1003' WHERE barcode = '${barCode}' AND productStatus = '1006';`)
+}
 
 module.exports = {
     getAllInQuery,
-    outTargetProductQuery
+    outTargetProductQuery,
+    outHistoryQuery,
+    reWorkHistotyQuery,
+    reWorkOutTargetProductQuery,
+    reWorkBackTargetProductQuery
 }
