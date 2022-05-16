@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Result = require('../model/Result')
-const { loadingPdfCodesService, checkPdfTrayCodeService, deleteErrorPdfCodeServiece, queryBarCodeInTrayCodeService, commitTrayCodeIntoWhService, scanAPdfTrayCodeService } = require('../handles/PdfScanCodeService')
+const { loadingPdfCodesService, checkPdfTrayCodeService, deleteErrorPdfCodeServiece, queryBarCodeInTrayCodeService, commitTrayCodeIntoWhService, scanAPdfTrayCodeService, checkNewTrayStService, addNewPdftrayService,delTargetBarCodeService, addTargetBarCodeService } = require('../handles/PdfScanCodeService')
 const { OPEN_DEBUG } = require('../globalconfig')
 
 //1：每次扫入的一个托码到服务端进行验证并插入到暂存表(StorageTray和storageBar)
@@ -36,9 +36,29 @@ router.get('/scanAPdfTrayCode', (req, res)=>{
         //2:取出托码对应的信息和托码下面条码对应的信息，
         //3:插入数据到storagetray和storageBar.此处还需要加上事务控制，保证全部成功或者全部失败
     }
+})
 
 
-    
+//创建虚拟托码
+router.post('/addNewPdftray', (req, res)=>{
+    let {trayCode, whId, fstId, createPerson, pdaCode} = req.body
+    async function creteNewTray(){
+        let msg = await checkNewTrayStService(fstId, whId, trayCode)
+        console.log(msg);
+        if (msg === 'success') {
+            let addRes = await addNewPdftrayService(pdaCode, trayCode, createPerson)
+            if(addRes === 'success'){
+                new Result('插入成功').success(res)
+            }else{
+                new Result('添加虚拟托码失败').fail(res)
+            }
+        }else if(msg === 'real excited'){
+            new Result('某仓库中已经存在该托， 不可再创建!').fail(res)
+        }else if(msg === 'vitual excited'){
+            new Result('待入库的已经存在该托， 不可再创建!').fail(res)
+        }
+    }
+    creteNewTray()
 })
 
 //2：提交扫入的所有托码.
@@ -88,7 +108,6 @@ router.post('/commitTrayCodeIntoWh', (req, res) => {
     let flag = ''
     async function getCommitTrayCodeFlag(){
         flag = await commitTrayCodeIntoWhService(pdaCode, scanId, whId)
-
         if( flag > 0 ){
             flag = 'success'
         }else{
@@ -97,6 +116,34 @@ router.post('/commitTrayCodeIntoWh', (req, res) => {
         return flag
     }
     getCommitTrayCodeFlag()
+})
+
+//删除虚拟表中指定的错误条码
+router.post('/delErrorBarCode', (req, res)=>{
+    let { barCode } = req.body
+    async function delErrorBarCode(){
+        let delRes = await delTargetBarCodeService(barCode)
+        if(delRes === 'success'){
+            new Result('删除成功').success(res)
+        }else{
+            new Result('删除失败,目标数据不存在').fail(res)
+        }
+    }
+    delErrorBarCode()
+})
+
+//添加条码
+router.post('/addScanBarCode', (req, res)=>{
+    let {barCode} = req.body
+    async function addBarCode(){
+        let addRes = await addTargetBarCodeService(barCode)
+        if(addRes === 'success'){
+            new Result('扫入成功').success(res)
+        }else{
+            new Result('扫入失败').fail(res)
+        }
+    }
+    addBarCode()
 })
 
 

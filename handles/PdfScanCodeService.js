@@ -1,4 +1,5 @@
-const { loadingPdfCodes, checkPdfTrayCodeQuery, checkPdfTrayIdQuery, getStId, deleteErrorPdfBarCode, deleteErrorPdfTrayCode, queryBarCodeInTrayCode, getProducyItemsCountQuery} = require('../services/PdfScanCodeMapper')
+const { loadingPdfCodes, checkPdfTrayCodeQuery, checkPdfTrayIdQuery, getStId, deleteErrorPdfBarCode, deleteErrorPdfTrayCode, queryBarCodeInTrayCode, getProducyItemsCountQuery, addTrayCodeInStQuery, checkNTrayCodeQuery, delErrorBarCodeQuery, addNewBarCodeQuery} = require('../services/PdfScanCodeMapper')
+const { getTargetTrayCountQuery } = require('../services/InventoryMapper')
 const { OPEN_DEBUG } = require('../globalconfig')
 
 
@@ -6,7 +7,61 @@ function loadingPdfCodesService(pdaCode, scanId, whId) {
     return loadingPdfCodes(pdaCode, scanId, whId)
 }
 
-// function che
+
+//缓存表新建托，storagetray
+async function addNewPdftrayService(pdaCode, trayCode, createPerson){
+    let msg = 'success'
+    let addRes = await addTrayCodeInStQuery(pdaCode ,trayCode, createPerson)
+    if(addRes.affectRows <= 0){
+        return msg = 'failed'
+    }
+    return msg
+}
+
+
+// 先检测要创建的托是否存在
+async function checkNewTrayStService(fstId, whId, trayCode ) {
+    let msg = 'success'
+    let trayList = await getTargetTrayCountQuery(fstId, whId, trayCode)
+    console.log(trayList);
+    if(trayList[0].trayCount >= 1){
+        msg = 'real excited'
+    }
+    let trayNMsg = await checkNTrayCodeQuery(trayCode)
+    if( trayNMsg[0].whCount >= 1){
+        msg = 'vitual excited'
+    }
+    console.log(msg);
+    return msg
+}
+
+
+
+// 插入单条数据到缓存库里面
+async function addTargetBarCodeService(barCode){
+    let msg = 'success'
+    let delRes = await addNewBarCodeQuery(barCode)
+    if(delRes.affectedRows <= 0){
+        msg = 'failed'
+    }
+    return msg
+    // console.log(del);
+}
+
+
+//删除指定的体条码
+async function delTargetBarCodeService(barCode){
+    let msg = 'success'
+    let delRes = await delErrorBarCodeQuery(barCode)
+    if(delRes.affectedRows <= 0){
+        msg = 'failed'
+    }
+    return msg
+    // console.log(del);
+}
+
+
+
 
 async function scanAPdfTrayCodeService(pdaCode, scanId, whId, trayCode){
     let msg = 'success'
@@ -83,22 +138,15 @@ async function commitTrayCodeIntoWhService(pdaCode, scanId, whId){
         //这里只写最后一步。其实和误删除的操作方式类似.但是这里是批处理
 }
 
-
-// function checkWarehouseIsFullService(whCode){
-//     let msg = 'not full'
-//     let  count = getProducyItemsCountQuery(whCode)
-//     if(count > ){
-
-//     }
-// }
-
-
-
 module.exports = {
     loadingPdfCodesService,
     checkPdfTrayCodeService,
     deleteErrorPdfCodeServiece,
     queryBarCodeInTrayCodeService,
     commitTrayCodeIntoWhService,
-    scanAPdfTrayCodeService
+    scanAPdfTrayCodeService,
+    checkNewTrayStService,
+    addNewPdftrayService,
+    delTargetBarCodeService,
+    addTargetBarCodeService
 }
